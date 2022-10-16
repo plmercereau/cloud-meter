@@ -63,7 +63,7 @@ export default async (
 
   // * Get the image from the Nhost storage
 
-  const { data: file } = await axios.get(
+  const { data: stream } = await axios.get(
     `${process.env.NHOST_BACKEND_URL}/v1/storage/files/${req.body.event.data.new.id}`,
     {
       headers: {
@@ -71,6 +71,13 @@ export default async (
       }
     }
   )
+  const bytes = Object.keys(stream).length
+  const file = new Uint8Array(bytes)
+
+  for (var i = 0; i < bytes; i++) {
+    file[i] = stream[i].charCodeAt(0)
+  }
+
   var data = new FormData()
   data.append('filename', 'file.jpg')
   data.append('apikey', process.env.OCR_SPACE_API_KEY)
