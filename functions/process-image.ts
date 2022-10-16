@@ -63,7 +63,7 @@ export default async (
   // * Get the image from the Nhost storage
 
   const { data: presignedUrl } = await axios.get(
-    `${process.env.NHOST_BACKEND_URL}/files/${req.body.event.data.new.id}/presignedurl`,
+    `${process.env.NHOST_BACKEND_URL}/v1/storage/files/${req.body.event.data.new.id}/presignedurl`,
     {
       headers: {
         'x-hasura-admin-secret': process.env.NHOST_ADMIN_SECRET
