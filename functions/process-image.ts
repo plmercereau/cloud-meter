@@ -63,28 +63,22 @@ export default async (
 
   // * Get the image from the Nhost storage
 
-  const { data: stream } = await axios.get(
+  const { data: file } = await axios.get(
     `${process.env.NHOST_BACKEND_URL}/v1/storage/files/${req.body.event.data.new.id}`,
     {
+      responseType: 'arraybuffer',
       headers: {
         'x-hasura-admin-secret': process.env.NHOST_ADMIN_SECRET
       }
     }
   )
-  // const bytes = Object.keys(stream).length
-  // const file = new Uint8Array(bytes)
-  const blob = new Blob([stream], { type: 'image/jpeg' })
-  console.log('created the blob')
-  // for (var i = 0; i < bytes; i++) {
-  //   file[i] = stream[i].charCodeAt(0)
-  // }
 
   var data = new FormData()
   data.append('filename', 'file.jpg')
   data.append('apikey', process.env.OCR_SPACE_API_KEY)
   data.append('OCREngine', 2)
   data.append('detectOrientation', true)
-  data.append('file', blob)
+  data.append('file', file)
 
   try {
     const ocr = await axios.post('https://api.ocr.space/parse/image', data, {
