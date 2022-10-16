@@ -2,6 +2,7 @@ import { Request, Response } from 'express'
 import { GraphQLClient } from 'graphql-request'
 import axios from 'axios'
 import FormData from 'form-data'
+import { Blob } from 'buffer'
 
 // TODO move into something like @nhost/functions-utils
 type FileRecord = {
