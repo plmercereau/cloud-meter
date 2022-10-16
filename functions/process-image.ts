@@ -1,6 +1,7 @@
 import { Request, Response } from 'express'
 import { GraphQLClient } from 'graphql-request'
 import axios from 'axios'
+import FormData from 'form-data'
 
 // TODO move into something like @nhost/functions-utils
 type FileRecord = {
@@ -70,17 +71,24 @@ export default async (
       }
     }
   )
-  console.log('DATA', data)
-  const ocr = await axios.post(
-    'https://api.ocr.space/parse',
-    { file: data, detectOrientation: true, OCREngine: 2 },
-    {
-      headers: {
-        apikey: process.env.OCR_SPACE_API_KEY
+  var form = new FormData()
+  form.append('filename', 'file.jpg')
+  form.append('file', data)
+
+  try {
+    const ocr = await axios.post(
+      'https://api.ocr.space/parse',
+      { file: form, detectOrientation: true, OCREngine: 2 },
+      {
+        headers: {
+          apikey: process.env.OCR_SPACE_API_KEY
+        }
       }
-    }
-  )
-  console.log(ocr.data)
+    )
+    console.log(ocr.data)
+  } catch (e) {
+    console.log(e)
+  }
   // const client = new GraphQLClient(
   //   `${process.env.NHOST_BACKEND_URL}/v1/graphql`,
   //   {
