@@ -71,19 +71,20 @@ export default async (
       }
     }
   )
-  const bytes = Object.keys(stream).length
-  const file = new Uint8Array(bytes)
-
-  for (var i = 0; i < bytes; i++) {
-    file[i] = stream[i].charCodeAt(0)
-  }
+  // const bytes = Object.keys(stream).length
+  // const file = new Uint8Array(bytes)
+  const dd = new Blob(stream, { type: 'application/octet-stream' })
+  console.log('created the blob')
+  // for (var i = 0; i < bytes; i++) {
+  //   file[i] = stream[i].charCodeAt(0)
+  // }
 
   var data = new FormData()
   data.append('filename', 'file.jpg')
   data.append('apikey', process.env.OCR_SPACE_API_KEY)
   data.append('OCREngine', 2)
   data.append('detectOrientation', true)
-  data.append('file', file)
+  data.append('file', await dd.arrayBuffer())
 
   try {
     const ocr = await axios.post('https://api.ocr.space/parse/image', data, {
