@@ -1,8 +1,7 @@
 import { Request, Response } from 'express'
 import { GraphQLClient } from 'graphql-request'
 import axios from 'axios'
-import FormData from 'form-data'
-import { Blob } from 'buffer'
+import { FormData, Blob } from 'formdata-node'
 
 // TODO move into something like @nhost/functions-utils
 type FileRecord = {
@@ -74,7 +73,7 @@ export default async (
   )
   // const bytes = Object.keys(stream).length
   // const file = new Uint8Array(bytes)
-  const dd = new Blob([stream], { type: 'application/octet-stream' })
+  const blob = new Blob([stream], { type: 'image/jpeg' })
   console.log('created the blob')
   // for (var i = 0; i < bytes; i++) {
   //   file[i] = stream[i].charCodeAt(0)
@@ -85,7 +84,7 @@ export default async (
   data.append('apikey', process.env.OCR_SPACE_API_KEY)
   data.append('OCREngine', 2)
   data.append('detectOrientation', true)
-  data.append('file', await dd.arrayBuffer())
+  data.append('file', blob)
 
   try {
     const ocr = await axios.post('https://api.ocr.space/parse/image', data, {

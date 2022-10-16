@@ -3,14 +3,14 @@ lockfileVersion: 5.4
 specifiers:
   '@types/express': ^4.17.14
   axios: ^1.1.3
-  form-data: ^4.0.0
+  formdata-node: ^5.0.0
   graphql: ^16.6.0
   graphql-request: ^5.0.0
   typescript: ^4.6.4
 
 dependencies:
   axios: 1.1.3
-  form-data: 4.0.0
+  formdata-node: 5.0.0
   graphql: 16.6.0
   graphql-request: 5.0.0_graphql@16.6.0
 
@@ -148,6 +148,14 @@ packages:
       mime-types: 2.1.35
     dev: false
 
+  /formdata-node/5.0.0:
+    resolution: {integrity: sha512-zrGsVVS56jJo+htsVv7ffXuzie91a2NrU1cPamvtPaSyRX++SH+4KXlGoOt+ncgDJ4bFA2SAQ+QGA+p4l1vciw==}
+    engines: {node: '>= 14.17'}
+    dependencies:
+      node-domexception: 1.0.0
+      web-streams-polyfill: 4.0.0-beta.3
+    dev: false
+
   /graphql-request/5.0.0_graphql@16.6.0:
     resolution: {integrity: sha512-SpVEnIo2J5k2+Zf76cUkdvIRaq5FMZvGQYnA4lUWYbc99m+fHh4CZYRRO/Ff4tCLQ613fzCm3SiDT64ubW5Gyw==}
     peerDependencies:
@@ -179,6 +187,11 @@ packages:
       mime-db: 1.52.0
     dev: false
 
+  /node-domexception/1.0.0:
+    resolution: {integrity: sha512-/jKZoMpw0F8GRwl4/eLROPA3cfcXtLApP0QzLmUT/HuPCZWyB7IY9ZrMeKw2O/nFIqPQB3PVM9aYm0F312AXDQ==}
+    engines: {node: '>=10.5.0'}
+    dev: false
+
   /node-fetch/2.6.7:
     resolution: {integrity: sha512-ZjMPFEfVx5j+y2yF35Kzx5sF7kDzxuDj6ziH4FFbOp87zKDZNx8yExJIb05OGF4Nlt9IHFIMBkRl41VdvcNdbQ==}
     engines: {node: 4.x || >=6.0.0}
@@ -204,6 +217,11 @@ packages:
     engines: {node: '>=4.2.0'}
     hasBin: true
     dev: true
+
+  /web-streams-polyfill/4.0.0-beta.3:
+    resolution: {integrity: sha512-QW95TCTaHmsYfHDybGMwO5IJIM93I/6vTRk+daHTWFPhwh+C8Cg7j7XyKrwrj8Ib6vYXe0ocYNrmzY4xAAN6ug==}
+    engines: {node: '>= 14'}
+    dev: false
 
   /webidl-conversions/3.0.1:
     resolution: {integrity: sha512-2JAn3z8AR6rjK8Sm8orRC0h/bcl/DqL7tRPdGZ4I1CjdF+EaMLmYxBHyXuKL849eucPFhvBoxMsflfOb8kxaeQ==}
