@@ -73,7 +73,7 @@ export default async (
   )
   // const bytes = Object.keys(stream).length
   // const file = new Uint8Array(bytes)
-  const dd = new Blob(stream, { type: 'application/octet-stream' })
+  const dd = new Blob([stream], { type: 'application/octet-stream' })
   console.log('created the blob')
   // for (var i = 0; i < bytes; i++) {
   //   file[i] = stream[i].charCodeAt(0)
