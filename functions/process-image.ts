@@ -97,6 +97,7 @@ export default async (
   } catch (e) {
     console.log(e)
   }
+  return res.json('OK')
   // const client = new GraphQLClient(
   //   `${process.env.NHOST_BACKEND_URL}/v1/graphql`,
   //   {
