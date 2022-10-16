@@ -1,52 +1,9 @@
 import { Request, Response } from 'express'
 import { GraphQLClient } from 'graphql-request'
 import axios from 'axios'
-import { FormData, Blob } from 'formdata-node'
+import FormData from 'form-data'
 
-// TODO move into something like @nhost/functions-utils
-type FileRecord = {
-  id: string
-  created_at: string
-  updated_at: string
-  size: number
-  is_uploaded: boolean
-  uploaded_by_user_id: string
-  bucket_id: string
-  name: string
-  mime_type: string
-  etag: string
-}
-
-// TODO move into something like @nhost/functions-utils and/or @nhost/hasura-utils
-type EventPayload<
-  T extends {},
-  U extends 'INSERT' | 'UPDATE' | 'DELETE' | 'UNKNOWN' = 'UNKNOWN'
-> = {
-  event: {
-    op: U
-    data: {
-      old: U extends 'UNKNOWN' ? T | null : U extends 'INSERT' ? null : T
-      new: U extends 'UNKNOWN' ? T | null : U extends 'DELETE' ? null : T
-    }
-    trace_context: {
-      trace_id: string
-      span_id: string
-    }
-  }
-  created_at: string //'2022-10-16T14:43:49.644Z'
-  id: string //'2c173942-a860-4a4c-ab71-9a29e2384d54'
-  delivery_info: {
-    max_retries: number
-    current_retry: number
-  }
-  trigger: {
-    name: string
-  }
-  table: {
-    schema: string
-    name: string
-  }
-}
+import { EventPayload, FileRecord, getSdk } from './_utils'
 
 export default async (
   req: Request<{}, {}, EventPayload<FileRecord, 'INSERT'>>,
@@ -61,12 +18,22 @@ export default async (
     return res.status(401).send('unauthorized')
   }
 
-  // * Get the image from the Nhost storage
-
-  const { data: file } = await axios.get(
-    `${process.env.NHOST_BACKEND_URL}/v1/storage/files/${req.body.event.data.new.id}`,
+  const client = new GraphQLClient(
+    `${process.env.NHOST_BACKEND_URL}/v1/graphql`,
     {
-      responseType: 'arraybuffer',
+      headers: {
+        'x-hasura-admin-secret': process.env.NHOST_ADMIN_SECRET!
+      }
+    }
+  )
+  const sdk = getSdk(client)
+  const { id: fileId, created_at: time } = req.body.event.data.new
+
+  // * Get the image from the Nhost storage
+  const { data: file } = await axios.get(
+    `${process.env.NHOST_BACKEND_URL}/v1/storage/files/${fileId}`,
+    {
+      responseType: 'stream',
       headers: {
         'x-hasura-admin-secret': process.env.NHOST_ADMIN_SECRET
       }
@@ -74,29 +41,67 @@ export default async (
   )
 
   var data = new FormData()
-  data.append('filename', 'file.jpg')
   data.append('apikey', process.env.OCR_SPACE_API_KEY)
-  data.append('OCREngine', 2)
-  data.append('detectOrientation', true)
+  data.append('language', 'eng')
+  data.append('OCREngine', '2')
+  data.append('filetype', 'jpg')
+  data.append('detectOrientation', 'false')
+  data.append('isOverlayRequired', 'true')
+  data.append('detectCheckbox', 'false')
+  data.append('checkboxTemplate', '0 ')
+  data.append('IsCreateSearchablePDF', 'false')
+  data.append('isSearchablePdfHideTextLayer', 'false')
+  data.append('isTable', 'false')
+  data.append('scale', 'true')
   data.append('file', file)
-
   try {
-    const ocr = await axios.post('https://api.ocr.space/parse/image', data, {
-      headers: {
-        'Content-Type': 'multipart/form-data'
+    const {
+      data: {
+        ParsedResults: [{ ParsedText }]
       }
-    })
-    console.log(ocr.data)
+    } = await axios.post(
+      'https://api.ocr.space/parse/image?OCREngine=2&filetype=jpg',
+      data,
+      {
+        headers: {
+          apikey: process.env.OCR_SPACE_API_KEY,
+          ...data.getHeaders()
+        },
+        maxContentLength: Infinity,
+        maxBodyLength: Infinity
+      }
+    )
+
+    const stringValue = ParsedText.split('\n')[0].replace(/[^\d\.]/g, '')
+    const [integer, _decimal] = stringValue.split('.')
+    if (integer.length != 5) {
+      await sdk.insertImageProcessing({
+        fileId,
+        status: 10,
+        message: `incorrect number of digits: ${integer}`
+      })
+    } else {
+      const value = parseFloat(stringValue)
+      console.log('Value is', value)
+      const { result } = await sdk.insertImageProcessing({
+        fileId,
+        status: 0,
+        message: ParsedText
+      })
+      const imageProcessingId = result!.id
+      await sdk.insertMeasurement({
+        value,
+        imageProcessingId,
+        time
+      })
+    }
   } catch (e) {
-    console.log(e)
+    const error = e as Error
+    await sdk.insertImageProcessing({
+      fileId,
+      status: 1,
+      message: error.message
+    })
   }
   return res.json('OK')
-  // const client = new GraphQLClient(
-  //   `${process.env.NHOST_BACKEND_URL}/v1/graphql`,
-  //   {
-  //     headers: {
-  //       'x-hasura-admin-secret': process.env.NHOST_ADMIN_SECRET!
-  //     }
-  //   }
-  // )
 }

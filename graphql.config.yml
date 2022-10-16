@@ -3,23 +3,23 @@ schema:
       headers:
         x-hasura-admin-secret: nhost-admin-secret
 generates:
-  ./src/graphql/generated.ts:
-    schema:
-      - http://localhost:1337/v1/graphql:
-          headers:
-            x-hasura-admin-secret: nhost-admin-secret
-            x-hasura-role: user
-    documents: 'src/**/*.graphql'
-    config:
-      namingConvention:
-        typeNames: change-case-all#pascalCase
-        transformUnderscore: true
-      vueCompositionApiImportFrom: vue
-    plugins:
-      - typescript
-      - typescript-operations
-      - typescript-vue-apollo
-  ./functions/_sdk.ts:
+  # ./src/graphql/generated.ts:
+  #   schema:
+  #     - http://localhost:1337/v1/graphql:
+  #         headers:
+  #           x-hasura-admin-secret: nhost-admin-secret
+  #           x-hasura-role: user
+  #   documents: 'src/**/*.graphql'
+  #   config:
+  #     namingConvention:
+  #       typeNames: change-case-all#pascalCase
+  #       transformUnderscore: true
+  #     vueCompositionApiImportFrom: vue
+  #   plugins:
+  #     - typescript
+  #     - typescript-operations
+  #     - typescript-vue-apollo
+  ./functions/_utils/sdk.ts:
     schema:
       - http://localhost:1337/v1/graphql:
           headers:

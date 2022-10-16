@@ -1,0 +1,27 @@
+mutation insertImageProcessing(
+  $fileId: uuid!
+  $status: Int!
+  $message: String
+) {
+  result: insert_image_processing_one(
+    object: { file_id: $fileId, status: $status, message: $message }
+  ) {
+    id
+  }
+}
+
+mutation insertMeasurement(
+  $imageProcessingId: uuid!
+  $value: float8!
+  $time: timestamptz
+) {
+  result: insert_measurement_one(
+    object: {
+      image_processing_id: $imageProcessingId
+      value: $value
+      time: $time
+    }
+  ) {
+    id
+  }
+}
