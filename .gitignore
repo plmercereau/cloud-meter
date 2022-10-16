@@ -1,0 +1,6 @@
+node_modules
+.env*
+device
+.nhost
+web/node_modules
+functions/node_modules

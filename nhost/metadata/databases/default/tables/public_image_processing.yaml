@@ -1,0 +1,13 @@
+table:
+  name: image_processing
+  schema: public
+object_relationships:
+  - name: image
+    using:
+      manual_configuration:
+        column_mapping:
+          file_id: id
+        insertion_order: null
+        remote_table:
+          name: files
+          schema: storage
