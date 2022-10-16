@@ -63,7 +63,7 @@ export default async (
 
   // * Get the image from the Nhost storage
 
-  const { data } = await axios.get(
+  const { data: file } = await axios.get(
     `${process.env.NHOST_BACKEND_URL}/v1/storage/files/${req.body.event.data.new.id}`,
     {
       headers: {
@@ -71,20 +71,19 @@ export default async (
       }
     }
   )
-  var form = new FormData()
-  form.append('filename', 'file.jpg')
-  form.append('file', data)
+  var data = new FormData()
+  data.append('filename', 'file.jpg')
+  data.append('apikey', process.env.OCR_SPACE_API_KEY)
+  data.append('OCREngine', 2)
+  data.append('detectOrientation', true)
+  data.append('file', file)
 
   try {
-    const ocr = await axios.post(
-      'https://api.ocr.space/parse',
-      { file: form, detectOrientation: true, OCREngine: 2 },
-      {
-        headers: {
-          apikey: process.env.OCR_SPACE_API_KEY
-        }
+    const ocr = await axios.post('https://api.ocr.space/parse/image', data, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
       }
-    )
+    })
     console.log(ocr.data)
   } catch (e) {
     console.log(e)
