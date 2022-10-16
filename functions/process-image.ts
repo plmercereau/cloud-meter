@@ -78,7 +78,7 @@ export default async (
       await sdk.insertImageProcessing({
         fileId,
         status: 10,
-        message: `incorrect number of digits: ${integer}`
+        message: `incorrect number of digits: ${integer}: ${ParsedText}`
       })
     } else {
       const value = parseFloat(stringValue)
