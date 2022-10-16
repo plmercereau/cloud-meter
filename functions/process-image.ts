@@ -73,15 +73,20 @@ export default async (
     )
 
     const stringValue = ParsedText.split('\n')[0].replace(/[^\d\.]/g, '')
-    const [integer, _decimal] = stringValue.split('.')
-    if (integer.length != 5) {
+    const [integer, decimal] = stringValue.split('.')
+    // TODO explain the followwing lines
+    if (decimal && integer.length != 5) {
       await sdk.insertImageProcessing({
         fileId,
         status: 10,
         message: `incorrect number of digits: ${integer}: ${ParsedText}`
       })
     } else {
-      const value = parseFloat(stringValue)
+      const value = parseFloat(
+        decimal
+          ? stringValue
+          : stringValue.slice(0, 5) + '.' + stringValue.slice(5)
+      )
       console.log('Value is', value)
       const { result } = await sdk.insertImageProcessing({
         fileId,
