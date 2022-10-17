@@ -85,8 +85,6 @@ event_triggers:
       enable_manual: false
       insert:
         columns: '*'
-      update:
-        columns: '*'
     retry_conf:
       interval_sec: 3
       num_retries: 0
