@@ -3,7 +3,7 @@ import { useQuery, useSubscription } from '@vue/apollo-composable'
 import gql from 'graphql-tag'
 import { sub } from 'date-fns'
 
-import { computed, watch, watchEffect } from 'vue'
+import { computed } from 'vue'
 import { Line } from 'vue-chartjs'
 import 'chartjs-adapter-date-fns'
 
@@ -30,38 +30,38 @@ ChartJS.register(
   PointElement
 )
 
-type AvgRecord = { time: string; avg: number }
+type AvgRecord = { time: string; value: number }
 type AvgRecords = Array<AvgRecord>
-type Record = { createdAt: string, value: number }
+type Record = { created_at: string, value: number }
 
 const tick = sub(new Date(), { minutes: 10 }).toISOString()
 const QUERY = gql`
   query previousValues($tick: timestamptz!) {
-    temperatureRecap(where: { time: { _lte: $tick } }) {
+    measurement(where: { time: { _lte: $tick } }) {
       time
-      avg
+      value
     }
   }
 `
 
 const NEW_VALUES = gql`
   subscription newValues($tick: timestamptz!) {
-    temperatureRecap(where: { time: { _gt: $tick } }) {
+    measurement(where: { time: { _gt: $tick } }) {
       time
-      avg
+      value
     }
   }
 `
 
 const LAST_TEMPERATURE = gql`
 subscription lastValue {
-  temperature(limit: 1, order_by: {createdAt: desc}) {
-    createdAt
+  measurement(limit: 1, order_by: {created_at: desc}) {
+    created_at
     value
   }
 }`
 
-const { result, subscribeToMore } = useQuery<{ temperatureRecap: AvgRecords }>(
+const { result, subscribeToMore } = useQuery<{ measurement: AvgRecords }>(
   QUERY,
   { tick }
 )
@@ -70,21 +70,21 @@ subscribeToMore({
   document: NEW_VALUES,
   variables: { tick },
   updateQuery: (previousResult, { subscriptionData }) => {
-    const previous: AvgRecords = previousResult?.temperatureRecap || []
-    const next: AvgRecords = subscriptionData.data.temperatureRecap || []
-    return { temperatureRecap: [...previous.filter((r) => !next.find((n) => n.time === r.time)), ...next] }
+    const previous: AvgRecords = previousResult?.measurement || []
+    const next: AvgRecords = subscriptionData.data.measurement || []
+    return { measurement: [...previous.filter((r) => !next.find((n) => n.time === r.time)), ...next] }
   }
 })
 
 const chartData = computed<ChartData<'line', Array<any>>>(() => ({
   datasets: [
     {
-      label: 'Temperature',
+      label: 'Value',
       borderColor: 'rgb(75, 192, 192)',
       tension: 0.1,
       fill: false,
 
-      data: result.value?.temperatureRecap || []
+      data: result.value?.measurement || []
     }
   ]
 }))
@@ -93,7 +93,7 @@ const chartOptions: TChartOptions<'line'> = {
   maintainAspectRatio: false,
   parsing: {
     xAxisKey: 'time',
-    yAxisKey: 'avg'
+    yAxisKey: 'value'
   },
   scales: {
     x: {
@@ -102,11 +102,11 @@ const chartOptions: TChartOptions<'line'> = {
   }
 }
 
-const { result: lastValueResult } = useSubscription<{ temperature: Array<Record> }>(LAST_TEMPERATURE, null, { fetchPolicy: 'no-cache' })
-const lastValue = computed<Record | undefined>(() => lastValueResult.value?.temperature[0])
+const { result: lastValueResult } = useSubscription<{ measurement: Array<Record> }>(LAST_TEMPERATURE, null, { fetchPolicy: 'no-cache' })
+const lastValue = computed<Record | undefined>(() => lastValueResult.value?.measurement[0])
 </script>
 
 <template>
-  <h2 v-if="lastValue">Last value: {{lastValue.value}} at {{lastValue.createdAt}}</h2>
+  <h2 v-if="lastValue">Last value: {{lastValue.value}} at {{lastValue.created_at}}</h2>
   <Line :chart-data="chartData" :chart-options="chartOptions"></Line>
 </template>

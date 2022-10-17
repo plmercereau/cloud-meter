@@ -4,13 +4,13 @@ import { DefaultApolloClient } from '@vue/apollo-composable'
 
 import App from './App.vue'
 
-const BACKEND_URL = 'https://sqvwhuifcpyhrnllsxdf.nhost.run/v1/graphql'
-
 import { HttpLink, split } from '@apollo/client/core'
 import { WebSocketLink } from '@apollo/client/link/ws'
 import { getMainDefinition } from '@apollo/client/utilities'
 
 // TODO sqvwhuifcpyhrnllsxdf / eu-central-1
+const BACKEND_URL = 'https://sqvwhuifcpyhrnllsxdf.nhost.run/v1/graphql'
+
 // Create an http link:
 const httpLink = new HttpLink({
   uri: BACKEND_URL
