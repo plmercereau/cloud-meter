@@ -37,7 +37,7 @@ type Record = { created_at: string, value: number }
 const tick = sub(new Date(), { minutes: 10 }).toISOString()
 const QUERY = gql`
   query previousValues($tick: timestamptz!) {
-    measurement(where: { time: { _lte: $tick } }) {
+    measurement(where: { time: { _lte: $tick } }, order_by: {time: asc}) {
       time
       value
     }
@@ -46,7 +46,7 @@ const QUERY = gql`
 
 const NEW_VALUES = gql`
   subscription newValues($tick: timestamptz!) {
-    measurement(where: { time: { _gt: $tick } }) {
+    measurement(where: { time: { _gt: $tick } }, order_by: {time: asc}) {
       time
       value
     }
