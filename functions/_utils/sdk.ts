@@ -4779,6 +4779,11 @@ export type InsertMeasurementMutationVariables = Exact<{
 
 export type InsertMeasurementMutation = { __typename?: 'mutation_root', result?: { __typename?: 'measurement', id: any } | null };
 
+export type LastMeasurementQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type LastMeasurementQuery = { __typename?: 'query_root', lastMeasurement: Array<{ __typename?: 'measurement', value: any, time: any }> };
+
 
 export const InsertImageProcessingDocument = gql`
     mutation insertImageProcessing($fileId: uuid!, $status: Int!, $message: String) {
@@ -4798,6 +4803,14 @@ export const InsertMeasurementDocument = gql`
   }
 }
     `;
+export const LastMeasurementDocument = gql`
+    query lastMeasurement {
+  lastMeasurement: measurement(order_by: {time: desc}, limit: 1) {
+    value
+    time
+  }
+}
+    `;
 
 export type SdkFunctionWrapper = <T>(action: (requestHeaders?:Record<string, string>) => Promise<T>, operationName: string, operationType?: string) => Promise<T>;
 
@@ -4811,6 +4824,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     insertMeasurement(variables: InsertMeasurementMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<InsertMeasurementMutation> {
       return withWrapper((wrappedRequestHeaders) => client.request<InsertMeasurementMutation>(InsertMeasurementDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'insertMeasurement', 'mutation');
+    },
+    lastMeasurement(variables?: LastMeasurementQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<LastMeasurementQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<LastMeasurementQuery>(LastMeasurementDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'lastMeasurement', 'query');
     }
   };
 }

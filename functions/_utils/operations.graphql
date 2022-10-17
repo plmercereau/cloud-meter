@@ -25,3 +25,10 @@ mutation insertMeasurement(
     id
   }
 }
+
+query lastMeasurement {
+  lastMeasurement: measurement(order_by: { time: desc }, limit: 1) {
+    value
+    time
+  }
+}
