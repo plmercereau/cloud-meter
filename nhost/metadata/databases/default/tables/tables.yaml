@@ -6,6 +6,7 @@
 - "!include auth_user_roles.yaml"
 - "!include auth_user_security_keys.yaml"
 - "!include auth_users.yaml"
+- "!include public_consumption.yaml"
 - "!include public_image_processing.yaml"
 - "!include public_measurement.yaml"
 - "!include storage_buckets.yaml"
