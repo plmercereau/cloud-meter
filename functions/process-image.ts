@@ -92,10 +92,12 @@ export default async (
         message: ParsedText
       })
       const imageProcessingId = result!.id
-      const { lastMeasurement } = await sdk.lastMeasurement()
+      // TODO remove the lastMeasurment mutation
+      // const { lastMeasurement } = await sdk.lastMeasurement()
       await sdk.insertMeasurement({
         // * the previous value can be higher than the current one when we didn't get the last digit
-        value: Math.max(lastMeasurement?.[0].value || 0, value),
+        // value: Math.max(lastMeasurement?.[0].value || 0, value),
+        value,
         imageProcessingId,
         time
       })
