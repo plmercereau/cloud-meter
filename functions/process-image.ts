@@ -90,24 +90,21 @@ export default async (
       const lastValue = lastMeasurement?.[0].value || 0
       if (value < lastValue) {
         // * the new value cannot be less than the last one
-        await sdk.insertImageProcessing({
-          fileId,
-          status: 5,
-          message: `Parsed value ${value} is more than the last measurement: ${lastValue}`
-        })
-      } else {
-        const { result } = await sdk.insertImageProcessing({
-          fileId,
-          status: 0,
-          message: ParsedText
-        })
-        const imageProcessingId = result!.id
-        await sdk.insertMeasurement({
-          value,
-          imageProcessingId,
-          time
-        })
+        console.log(
+          `Parsed value ${value} is less than the last measurement: ${lastValue}`
+        )
       }
+      const { result } = await sdk.insertImageProcessing({
+        fileId,
+        status: 0,
+        message: ParsedText
+      })
+      const imageProcessingId = result!.id
+      await sdk.insertMeasurement({
+        value,
+        imageProcessingId,
+        time
+      })
     }
   } catch (e) {
     const error = e as Error
